@@ -3,6 +3,8 @@ import '../models/Tournament.dart';
 import '../models/Match.dart';
 import '../widgets/MatchBox.dart';
 import '../drawings/BracketLines.dart';
+import '../services/TournamentService.dart';
+import 'TournamentDetails.dart';
 
 class BracketPrediction extends StatefulWidget
 {
@@ -18,6 +20,7 @@ class BracketPredictionState extends State<BracketPrediction>
     final Map<int, TextEditingController> scoreControllers = {};
     final Map<String, List<Match>> matches = {};
     final ScrollController _horizontalController = ScrollController();
+    final tournamentService = TournamentService();
 
     @override
     void initState()
@@ -73,40 +76,66 @@ class BracketPredictionState extends State<BracketPrediction>
 
     void saveBracket()
     {
+        bool incompleteBracket = false;
         for (var key in ['quarters', 'semis', 'grands'])
         {
             for (var match in matches[key]!)
             {
                 if (match.team1 == 'TBD' || match.team2 == 'TBD')
                 {
-                    showDialog(
-                        context: context,
-                        builder: (BuildContext context)
-                        {
-                            return AlertDialog(
-                                title: Text('Incomplete Bracket'),
-                                content: Text('Fill out bracket first'),
-                                actions: [
-                                    TextButton(
-                                        onPressed: ()
-                                        {
-                                            Navigator.of(context).pop();
-                                        },
-                                        child: Text('OK')
-                                    )
-                                ]
-                            );
-                        }
-                    );
-                    return;
+                    incompleteBracket = true;
                 }
             }
         }
+        for (var controller in scoreControllers.values)
+        {
+            if (controller.text.isEmpty)
+            {
+                incompleteBracket = true;
+            }
+        }
 
-        // TODO:
-        // Order teams in tournament.teams
-        // save tournament to database
-        // redirect to tournament screen
+        if (incompleteBracket)
+        {
+            showDialog(
+                context: context,
+                builder: (BuildContext context)
+                {
+                    return AlertDialog(
+                        title: Text('Incomplete Scores'),
+                        content: Text('Fill out all scores first'),
+                        actions: [
+                            TextButton(
+                                onPressed: ()
+                                {
+                                    Navigator.of(context).pop();
+                                },
+                                child: Text('OK')
+                            )
+                        ]
+                    );
+                }
+            );
+            return;
+        }
+
+        List<String> teams = [];
+        teams.add(matches["grands"]![0].getWinner());// 1
+        teams.add(matches["grands"]![0].getLoser());// 2
+        teams.add(matches["semis"]![0].getLoser());// 3-4
+        teams.add(matches["semis"]![1].getLoser());// 3-4
+        teams.add(matches["quarters"]![0].getLoser());// 5-8
+        teams.add(matches["quarters"]![1].getLoser());// 5-8
+        teams.add(matches["quarters"]![2].getLoser());// 5-8
+        teams.add(matches["quarters"]![3].getLoser());// 5-8
+        widget.tournament.teams = teams;
+
+        tournamentService.addTournament(widget.tournament);
+
+        Navigator.push(
+            context,
+            MaterialPageRoute(builder: (context) => TournamentDetails(tournament: widget.tournament))
+        );
     }
 
     @override

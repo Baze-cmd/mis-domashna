@@ -51,7 +51,7 @@ class SeedTeamsState extends State<SeedTeams>
     Widget build(BuildContext context)
     {
         return Scaffold(
-            appBar: AppBar(title: Text('Enter Teams')),
+            appBar: AppBar(title: Text('Seed Teams')),
             body: Form(
                 key: _formKey,
                 child: SingleChildScrollView(

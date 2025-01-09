@@ -45,8 +45,8 @@ class TournamentService
         final db = await database;
         return await db.delete(
             'tournaments',
-            where: 'name = ?',
-            whereArgs: [tournament.name]
+            where: 'id = ?',
+            whereArgs: [tournament.id]
         );
     }
 
