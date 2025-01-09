@@ -1,16 +1,16 @@
 import 'package:flutter/material.dart';
 import '../models/Tournament.dart';
-import 'BracketScreen.dart';
+import 'BracketPrediction.dart';
 
 class SeedTeams extends StatefulWidget
 {
     const SeedTeams({super.key});
 
     @override
-    SeedTeamsScreenState createState() => SeedTeamsScreenState();
+    SeedTeamsState createState() => SeedTeamsState();
 }
 
-class SeedTeamsScreenState extends State<SeedTeams>
+class SeedTeamsState extends State<SeedTeams>
 {
     final _formKey = GlobalKey<FormState>();
     final _tournamentController = TextEditingController();
@@ -41,7 +41,7 @@ class SeedTeamsScreenState extends State<SeedTeams>
             Navigator.push(
                 context,
                 MaterialPageRoute(
-                    builder: (context) => BracketScreen()
+                    builder: (context) => BracketPrediction(tournament: tournament)
                 )
             );
         }
